@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { X, Upload, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useFoodContext } from '@/contexts/FoodContext';
 
 interface PostFoodModalProps {
   isOpen: boolean;
@@ -10,6 +10,7 @@ interface PostFoodModalProps {
 }
 
 const PostFoodModal = ({ isOpen, onClose }: PostFoodModalProps) => {
+  const { addListing } = useFoodContext();
   const [formData, setFormData] = useState({
     title: '',
     business: '',
@@ -25,8 +26,11 @@ const PostFoodModal = ({ isOpen, onClose }: PostFoodModalProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Posting food:', formData);
-    // Here you would integrate with your backend
-    alert('Food posted successfully! (This would connect to your backend)');
+    
+    // Add the listing to the context
+    addListing(formData);
+    
+    alert('Food posted successfully! Your listing is now visible to volunteers.');
     onClose();
     setFormData({
       title: '',
