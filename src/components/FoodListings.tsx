@@ -1,10 +1,19 @@
 
-import React from 'react';
-import { Clock, MapPin, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, MapPin, Users, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 const FoodListings = () => {
+  const [claimedItems, setClaimedItems] = useState<number[]>([]);
+
+  const handleClaim = (id: number, businessPhone: string) => {
+    if (claimedItems.includes(id)) return;
+    
+    setClaimedItems([...claimedItems, id]);
+    alert(`Food claimed! Contact ${businessPhone} for pickup details. (This would connect to your backend)`);
+  };
+
   const listings = [
     {
       id: 1,
@@ -15,7 +24,8 @@ const FoodListings = () => {
       servings: "15-20 people",
       image: "🥪",
       category: "Ready Meals",
-      status: "available"
+      status: "available",
+      phone: "(555) 123-4567"
     },
     {
       id: 2,
@@ -26,7 +36,8 @@ const FoodListings = () => {
       servings: "25-30 people",
       image: "🥐",
       category: "Baked Goods",
-      status: "urgent"
+      status: "urgent",
+      phone: "(555) 234-5678"
     },
     {
       id: 3,
@@ -37,7 +48,8 @@ const FoodListings = () => {
       servings: "10-15 people",
       image: "🥬",
       category: "Fresh Produce",
-      status: "available"
+      status: "available",
+      phone: "(555) 345-6789"
     },
     {
       id: 4,
@@ -48,20 +60,29 @@ const FoodListings = () => {
       servings: "20-25 people",
       image: "🍕",
       category: "Ready Meals",
-      status: "claimed"
+      status: "claimed",
+      phone: "(555) 456-7890"
     }
   ];
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string, id: number) => {
+    if (claimedItems.includes(id) || status === 'claimed') {
+      return 'bg-gray-100 text-gray-600';
+    }
     switch (status) {
       case 'urgent': return 'bg-red-100 text-red-800';
-      case 'claimed': return 'bg-gray-100 text-gray-600';
       default: return 'bg-green-100 text-green-800';
     }
   };
 
+  const getButtonText = (status: string, id: number) => {
+    if (claimedItems.includes(id)) return 'You Claimed This!';
+    if (status === 'claimed') return 'Already Claimed';
+    return 'Claim for Pickup';
+  };
+
   return (
-    <section className="py-16 bg-gray-50">
+    <section id="food-listings" className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -78,8 +99,9 @@ const FoodListings = () => {
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="text-4xl">{listing.image}</div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(listing.status)}`}>
-                    {listing.status === 'urgent' ? 'Urgent' : 
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(listing.status, listing.id)}`}>
+                    {claimedItems.includes(listing.id) ? 'Claimed by You' :
+                     listing.status === 'urgent' ? 'Urgent' : 
                      listing.status === 'claimed' ? 'Claimed' : 'Available'}
                   </span>
                 </div>
@@ -105,14 +127,21 @@ const FoodListings = () => {
                     <Users className="h-4 w-4 mr-2" />
                     Serves {listing.servings}
                   </div>
+                  {(claimedItems.includes(listing.id) || listing.status !== 'claimed') && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Phone className="h-4 w-4 mr-2" />
+                      {listing.phone}
+                    </div>
+                  )}
                 </div>
                 
                 <Button 
                   className="w-full" 
-                  disabled={listing.status === 'claimed'}
-                  variant={listing.status === 'claimed' ? 'secondary' : 'default'}
+                  disabled={listing.status === 'claimed' && !claimedItems.includes(listing.id)}
+                  variant={listing.status === 'claimed' && !claimedItems.includes(listing.id) ? 'secondary' : 'default'}
+                  onClick={() => handleClaim(listing.id, listing.phone)}
                 >
-                  {listing.status === 'claimed' ? 'Already Claimed' : 'Claim for Pickup'}
+                  {getButtonText(listing.status, listing.id)}
                 </Button>
               </CardContent>
             </Card>
