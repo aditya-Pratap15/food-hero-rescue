@@ -1,19 +1,69 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Clock, MapPin, Users, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useFoodContext } from '@/contexts/FoodContext';
 
 const FoodListings = () => {
-  const { listings, claimListing, claimedItems } = useFoodContext();
+  const [claimedItems, setClaimedItems] = useState<number[]>([]);
 
   const handleClaim = (id: number, businessPhone: string) => {
     if (claimedItems.includes(id)) return;
     
-    claimListing(id);
-    alert(`Food claimed! Contact ${businessPhone} for pickup details.`);
+    setClaimedItems([...claimedItems, id]);
+    alert(`Food claimed! Contact ${businessPhone} for pickup details. (This would connect to your backend)`);
   };
+
+  const listings = [
+    {
+      id: 1,
+      title: "Fresh Sandwiches & Wraps",
+      business: "Corner Deli",
+      distance: "0.4 miles",
+      timeLeft: "3 hours",
+      servings: "15-20 people",
+      image: "🥪",
+      category: "Ready Meals",
+      status: "available",
+      phone: "(555) 123-4567"
+    },
+    {
+      id: 2,
+      title: "Assorted Pastries",
+      business: "Morning Glory Bakery",
+      distance: "0.8 miles", 
+      timeLeft: "1.5 hours",
+      servings: "25-30 people",
+      image: "🥐",
+      category: "Baked Goods",
+      status: "urgent",
+      phone: "(555) 234-5678"
+    },
+    {
+      id: 3,
+      title: "Fresh Produce Mix",
+      business: "Green Valley Market",
+      distance: "1.2 miles",
+      timeLeft: "5 hours",
+      servings: "10-15 people",
+      image: "🥬",
+      category: "Fresh Produce",
+      status: "available",
+      phone: "(555) 345-6789"
+    },
+    {
+      id: 4,
+      title: "Pizza Slices",
+      business: "Tony's Pizza Palace",
+      distance: "0.6 miles",
+      timeLeft: "2 hours",
+      servings: "20-25 people",
+      image: "🍕",
+      category: "Ready Meals",
+      status: "claimed",
+      phone: "(555) 456-7890"
+    }
+  ];
 
   const getStatusColor = (status: string, id: number) => {
     if (claimedItems.includes(id) || status === 'claimed') {
@@ -48,7 +98,7 @@ const FoodListings = () => {
             <Card key={listing.id} className="hover:shadow-lg transition-shadow duration-300 bg-white">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="text-4xl">{listing.imageEmoji}</div>
+                  <div className="text-4xl">{listing.image}</div>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(listing.status, listing.id)}`}>
                     {claimedItems.includes(listing.id) ? 'Claimed by You' :
                      listing.status === 'urgent' ? 'Urgent' : 

@@ -1,28 +1,47 @@
 
 import React from 'react';
 import GoogleMap from './GoogleMap';
-import { useFoodContext } from '@/contexts/FoodContext';
 
 const LocationMap = () => {
-  const { listings } = useFoodContext();
-
-  // Convert listings to map markers
-  const foodLocations = listings
-    .filter(listing => listing.lat && listing.lng)
-    .map(listing => ({
-      lat: listing.lat!,
-      lng: listing.lng!,
-      title: listing.business,
+  // Sample data - you would get this from your backend
+  const foodLocations = [
+    {
+      lat: 37.7749,
+      lng: -122.4194,
+      title: "Corner Deli",
       info: `
         <div style="padding: 8px;">
-          <h3 style="margin: 0 0 8px 0; font-weight: bold;">${listing.title}</h3>
-          <p style="margin: 0; color: #666;">${listing.business} • ${listing.distance}</p>
-          <p style="margin: 4px 0 0 0; color: ${listing.status === 'urgent' ? '#dc2626' : '#16a34a'}; font-weight: bold;">
-            ${listing.status === 'urgent' ? 'Urgent - ' + listing.timeLeft + ' left' : 'Available'}
-          </p>
+          <h3 style="margin: 0 0 8px 0; font-weight: bold;">Fresh Sandwiches & Wraps</h3>
+          <p style="margin: 0; color: #666;">Corner Deli • 0.4 miles</p>
+          <p style="margin: 4px 0 0 0; color: #16a34a; font-weight: bold;">Available Now</p>
         </div>
       `
-    }));
+    },
+    {
+      lat: 37.7849,
+      lng: -122.4094,
+      title: "Morning Glory Bakery",
+      info: `
+        <div style="padding: 8px;">
+          <h3 style="margin: 0 0 8px 0; font-weight: bold;">Assorted Pastries</h3>
+          <p style="margin: 0; color: #666;">Morning Glory Bakery • 0.8 miles</p>
+          <p style="margin: 4px 0 0 0; color: #dc2626; font-weight: bold;">Urgent - 1.5h left</p>
+        </div>
+      `
+    },
+    {
+      lat: 37.7649,
+      lng: -122.4294,
+      title: "Green Valley Market",
+      info: `
+        <div style="padding: 8px;">
+          <h3 style="margin: 0 0 8px 0; font-weight: bold;">Fresh Produce Mix</h3>
+          <p style="margin: 0; color: #666;">Green Valley Market • 1.2 miles</p>
+          <p style="margin: 4px 0 0 0; color: #16a34a; font-weight: bold;">Available</p>
+        </div>
+      `
+    }
+  ];
 
   const center = { lat: 37.7749, lng: -122.4194 }; // San Francisco
 
