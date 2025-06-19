@@ -1,8 +1,9 @@
-
 import React, { useState } from 'react';
 import { X, Upload, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useFoodContext } from '@/contexts/FoodContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface PostFoodModalProps {
   isOpen: boolean;
@@ -10,6 +11,9 @@ interface PostFoodModalProps {
 }
 
 const PostFoodModal = ({ isOpen, onClose }: PostFoodModalProps) => {
+  const { addListing } = useFoodContext();
+  const { toast } = useToast();
+  
   const [formData, setFormData] = useState({
     title: '',
     business: '',
@@ -22,11 +26,71 @@ const PostFoodModal = ({ isOpen, onClose }: PostFoodModalProps) => {
     image: null as File | null
   });
 
+  // Helper function to calculate time left
+  const calculateTimeLeft = (pickupTime: string) => {
+    const now = new Date();
+    const pickup = new Date(pickupTime);
+    const diffInHours = Math.abs(pickup.getTime() - now.getTime()) / (1000 * 60 * 60);
+    
+    if (diffInHours < 1) {
+      return `${Math.round(diffInHours * 60)} minutes`;
+    } else if (diffInHours < 24) {
+      return `${Math.round(diffInHours)} hours`;
+    } else {
+      return `${Math.round(diffInHours / 24)} days`;
+    }
+  };
+
+  // Helper function to get emoji based on category
+  const getCategoryEmoji = (category: string) => {
+    switch (category) {
+      case 'Ready Meals': return '🍽️';
+      case 'Baked Goods': return '🥐';
+      case 'Fresh Produce': return '🥬';
+      case 'Dairy': return '🥛';
+      default: return '🍴';
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Posting food:', formData);
-    // Here you would integrate with your backend
-    alert('Food posted successfully! (This would connect to your backend)');
+    
+    // Generate random coordinates near San Francisco for demo
+    const lat = 37.7749 + (Math.random() - 0.5) * 0.1;
+    const lng = -122.4194 + (Math.random() - 0.5) * 0.1;
+    
+    // Calculate distance (mock calculation)
+    const distance = `${(Math.random() * 2 + 0.2).toFixed(1)} miles`;
+    
+    // Determine status based on time left
+    const timeLeft = calculateTimeLeft(formData.pickupTime);
+    const hoursLeft = parseFloat(timeLeft);
+    const status = hoursLeft < 2 ? 'urgent' : 'available';
+
+    const newListing = {
+      title: formData.title,
+      business: formData.business,
+      distance: distance,
+      timeLeft: timeLeft,
+      servings: formData.servings,
+      image: getCategoryEmoji(formData.category),
+      category: formData.category,
+      status: status as 'available' | 'urgent',
+      phone: formData.phone,
+      lat: lat,
+      lng: lng,
+      address: formData.address,
+      description: formData.description,
+      pickupTime: formData.pickupTime
+    };
+
+    addListing(newListing);
+    
+    toast({
+      title: "Food Posted Successfully!",
+      description: "Your food listing is now available for people to claim.",
+    });
+    
     onClose();
     setFormData({
       title: '',
